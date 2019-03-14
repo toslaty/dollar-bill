@@ -48,8 +48,6 @@ def table_stuff(req):
 				if(len(row) < 2):
 					pass
 				else:
-				#if(cell.text == '-'):
-				#cell.text == 'NaN'
 					first = cell.text
 					outputs.append(first)
 
@@ -72,7 +70,6 @@ def data_to_frame(cols, nlist,clist):
 	frame = pa.DataFrame(index = clist[5::5], columns = cols)
 
 	for x in range(4):
-		#print('columns is '+str(cols[x])+'\n Values are '+str(nlist[x]))
 		frame[cols[x]] = pa.Series(nlist[x::4], index = clist[5::5])
 
 	return frame
@@ -150,12 +147,21 @@ def get_special(symbol):
 		#empty = empty.fillna(0)
 		frame_to_db(empty, symbol)
 
-#gets the price from knoema
-def git_prices(sym, start, end):
 
+#gets the price from knoema for sym
+def git_prices(sym, start, end):
 
 	df = get_stock_us(sym,start,end)
 
+	cols1 = get_level_values(0).tolist()
+	cols1 = cols1[:4]
+
+	df.drop(cols1, axis= 1, inplace = True)
+	#df.stack()
+
+	print(df.columns.tolist())
+	print(df.columns.get_level_values(1).tolist())
+	#print(df.columns)
 	print(df)
 
 	#prices_to_db(df ,sym)

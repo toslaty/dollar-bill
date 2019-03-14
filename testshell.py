@@ -3,16 +3,18 @@ import cmd
 import sys
 from corre import *
 from getData import *
+from fundamath import *
 
 
 class Interp(cmd.Cmd):
 
-	intro ="Welcome to Testestshell Testestshell"
-	prompt = '(Shell)'
+	intro ="\nDollarbill greets you $$\n\n"
+	prompt = '(Dollarbill$)'
 
 	def do_get_corr(self,line):
+		"""get_corr [symbol1] [symbol2] [MM-DD-YYYY] [MM-DD-YYYY]"""
 		x = line.split(' ')
-		print(x)
+		#print(x)
 		corr_stocks(x[0],x[1],x[2],x[3])
 
 	#def do_get_beta(self, line):
@@ -25,9 +27,24 @@ class Interp(cmd.Cmd):
 
 	#def do_get_most_profitable():	
 
+	#def do_get_most_liquidity():
+
+	#def do_set_mailalarm():
+	def do_get_fundamental_ratios(self, line):
+		y = line.split(' ')
+		get_funda_ratios(y[0], y[1])
+
+	def do_test_sql(self,line):
+		"""tests sql to frame for further work"""
+		y = line.split(' ') 
+		t = get_funda(y[0])
+		print(t)
+
 	def do_get_fundamentals(self,line):
+		"""get_fundamentals [Company Symbol] 
+		gets the fundmental data for the given company"""
 		x = line.split(' ')
-		z = str(x[2])
+		z = str(x[0])
 		get_special(z)
 
 	def do_print(self,line):

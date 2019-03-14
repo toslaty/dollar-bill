@@ -4,16 +4,19 @@ from sqlalchemy_utils import database_exists, create_database
 import pandas as pa
 
 
-
 engine = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_fundamentals', pool_recycle= 3600) 
 engine2 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_daily', pool_recycle= 3600)
+
+def checkDB():
+
+	x = database_exists(engine.url)
+	return x
 
 
 def frame_to_db(frame,symbol):
 
 	if not database_exists(engine.url):
 			create_database(engine.url, encoding= 'utf8')
-		
 
 	connection = engine.connect()
 
@@ -28,12 +31,20 @@ def prices_to_db(frame, symbol):
 
 	connection = engine2.connect()
 
-	frame.reset_index(inplace =True)
+	#frame.reset_index(inplace =True)
 	frame.to_sql(symbol, con = engine2, if_exists='replace', index = True)
 
 
-#def get_funda(sym):
-	#frame = pa.Dataframe()
+def get_funda(sym):
 
-#def get_prices(sym):  
+	connection = engine.connect()
+	frame = pa.read_sql('SELECT * FROM '+str(sym), con = engine, index_col = 'index')
+
+	return frame
+
+#not ready
+def get_prices(sym):  
+	
+	connect = engine2.connect()
+	
 
