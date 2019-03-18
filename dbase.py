@@ -31,8 +31,7 @@ def prices_to_db(frame, symbol):
 
 	connection = engine2.connect()
 
-	#frame.reset_index(inplace =True)
-	frame.to_sql(symbol, con = engine2, if_exists='replace', index = True)
+	frame.to_sql(symbol, con = engine2, if_exists='replace', index = True, index_label = 'dt')
 
 
 def get_funda(sym):
@@ -43,8 +42,16 @@ def get_funda(sym):
 	return frame
 
 #not ready
-def get_prices(sym):  
+def get_prices(sym,start,end):  
 	
 	connect = engine2.connect()
-	
+
+	dbquery = "SELECT Close, dt FROM "+str(sym)+" WHERE dt BETWEEN DATE('"+str(start)+"') AND DATE('"+str(end)+"');"
+
+	frame = pa.read_sql(dbquery, con = engine2, index_col= 'dt')
+	print(frame)
+
+	return frame
+
+
 

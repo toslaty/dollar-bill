@@ -153,18 +153,12 @@ def git_prices(sym, start, end):
 
 	df = get_stock_us(sym,start,end)
 
-	cols1 = get_level_values(0).tolist()
+	cols1 = df.columns.names
 	cols1 = cols1[:4]
 
-	df.drop(cols1, axis= 1, inplace = True)
-	#df.stack()
+	df.columns = ['Close', 'High', 'Low', 'Open', 'Volume']
 
-	print(df.columns.tolist())
-	print(df.columns.get_level_values(1).tolist())
-	#print(df.columns)
-	print(df)
-
-	#prices_to_db(df ,sym)
+	prices_to_db(df ,sym)
 
 
 

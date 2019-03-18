@@ -2,6 +2,7 @@ import pandas as pa
 import math
 import datetime as dt 
 from datetime import datetime
+from dbase import *
 
 
 def corr_stocks(stocka,stockb,start,end):
@@ -9,22 +10,16 @@ def corr_stocks(stocka,stockb,start,end):
 	name1 = stocka	
 	name2 = stockb
 
-	startd = datetime.strptime(start,"%Y-%m-%d")
-	endd = datetime.strptime(end, "%Y-%m-%d")
+	fr1 = get_prices(name1,start,end)
 
-	fr1 = pa.read_csv(stocka+'.csv',parse_dates= True, index_col = 0)
-	fr1.drop(['Volume', 'Close', 'High', 'Low', 'Open'], 1, inplace = True)
-	fr1.rename(columns={"Adj Close" : name1}, inplace = True)
-	
-	fr2 = pa.read_csv(stockb+'.csv', parse_dates = True, index_col = 0)
-	fr2.drop(['Volume', 'Close', 'High', 'Low', 'Open'], 1, inplace = True)
-	fr2.rename(columns={"Adj Close" : name2}, inplace = True)
+	fr2 = get_prices(name2,start,end)
+	print(fr1)
 
-	rng1 = fr1.loc[startd : endd]
-	rng2 = fr2.loc[startd : endd]
+	fr1.rename(columns={"Close" : name1}, inplace = True)
+	fr2.rename(columns={"Close" : name2}, inplace = True)
 
-	ind = pa.concat([rng1,rng2], axis = 1)
-
+	ind = pa.concat([fr1,fr2], axis = 1)
+	print(ind)
 
 	mathemagic(ind)
 

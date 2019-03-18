@@ -12,7 +12,7 @@ class Interp(cmd.Cmd):
 	prompt = '(Dollarbill$)'
 
 	def do_get_corr(self,line):
-		"""get_corr [symbol1] [symbol2] [MM-DD-YYYY] [MM-DD-YYYY]"""
+		"""get_corr [symbol1] [symbol2] [YYYY-MM-DD] [YYYY-MM-DD]"""
 		x = line.split(' ')
 		#print(x)
 		corr_stocks(x[0],x[1],x[2],x[3])
@@ -21,7 +21,9 @@ class Interp(cmd.Cmd):
 		#x = line.split(' ')
 
 	def do_get_prices(self, line):
-	
+		"""get_prices [Company Symbol] [DD/MM/YYYY] [DD/MM/YYYY]
+		gets the prices from knoema for given symbol, startdate and enddate
+		"""
 		p = line.split(' ')	
 		git_prices(p[0],p[1], p[2])
 
@@ -30,6 +32,7 @@ class Interp(cmd.Cmd):
 	#def do_get_most_liquidity():
 
 	#def do_set_mailalarm():
+
 	def do_get_fundamental_ratios(self, line):
 		y = line.split(' ')
 		get_funda_ratios(y[0], y[1])
