@@ -78,10 +78,15 @@ def data_to_frame(cols, nlist,clist):
 def splitter(rev):
 
 	cols = []
-	for w in rev:
-		wort = w.split('/')
-		cols.append(wort[2])
 
+	if(len(rev) < 5):
+		for w in rev:
+			wort = w.split('/')
+			print(wort)
+			cols.append(wort[2])
+	else:
+		print('REWORK FOR ONLY 3 COLUMNS')		
+	print(rev)
 	return cols
 
 #kills comma in number cats everything to int64 and times 1000 because numbers o yahoo in thousands
@@ -92,7 +97,6 @@ def real_numbers(alldata):
 		alldata[col] = alldata[col].replace(',' , '', regex = True)
 		alldata[col] = alldata[col].astype('int64', errors = 'ignore')
 		alldata[col] = alldata[col] * 1000
-		print(alldata[col])
 
 	return alldata
 
@@ -137,14 +141,14 @@ def get_special(symbol):
 		alldata.reset_index(inplace = True)
 		alldata.replace('-', 0,inplace = True)
 		real_numbers(alldata)
-		print(alldata)
+		#alldata = alldata.set_index('index')
 
 		frame_to_db(alldata, symbol)
 
 	else:
+
 		print('No data available\n')
 		empty = pa.DataFrame(columns = [0,0,0])
-		#empty = empty.fillna(0)
 		frame_to_db(empty, symbol)
 
 

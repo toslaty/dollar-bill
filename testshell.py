@@ -33,9 +33,10 @@ class Interp(cmd.Cmd):
 
 	#def do_set_mailalarm():
 
+	#for testing purpoae after test it will be done automaticly
 	def do_get_fundamental_ratios(self, line):
 		y = line.split(' ')
-		get_funda_ratios(y[0], y[1])
+		get_funda_ratios(y[0])
 
 	def do_test_sql(self,line):
 		"""tests sql to frame for further work"""

@@ -6,6 +6,7 @@ import pandas as pa
 
 engine = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_fundamentals', pool_recycle= 3600) 
 engine2 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_daily', pool_recycle= 3600)
+engine3 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_fundamentals', pool_recycle = 3600)
 
 def checkDB():
 
@@ -20,8 +21,15 @@ def frame_to_db(frame,symbol):
 
 	connection = engine.connect()
 
-	frame.reset_index(inplace = True)
-	frame.to_sql(symbol, con = engine, if_exists='replace', index=True, index_label = 'None')
+	frame.reset_index(drop = True, inplace = True)	
+	frame.to_sql(symbol, con = engine, if_exists='replace', index=True, index_label = 'id')
+
+
+def fundas_to_db(frame, symbol):
+
+	connection = engine.connect()
+
+	frame.to_sql(symbol, con = engine3, if_exists = 'replace', index = True)
 
 
 def prices_to_db(frame, symbol):
@@ -41,7 +49,6 @@ def get_funda(sym):
 
 	return frame
 
-#not ready
 def get_prices(sym,start,end):  
 	
 	connect = engine2.connect()

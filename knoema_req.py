@@ -13,4 +13,6 @@ def get_stock_us(sym,start,end):
 
 	return frame
 
+#def get_world():
+
 
