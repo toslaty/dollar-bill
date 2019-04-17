@@ -6,7 +6,7 @@ import pandas as pa
 
 engine = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_fundamentals', pool_recycle= 3600) 
 engine2 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_daily', pool_recycle= 3600)
-engine3 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_fundamentals', pool_recycle = 3600)
+engine3 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_ratios', pool_recycle = 3600)
 
 def checkDB():
 
@@ -22,14 +22,19 @@ def frame_to_db(frame,symbol):
 	connection = engine.connect()
 
 	frame.reset_index(drop = True, inplace = True)	
+	frame.drop(frame.index[57], inplace = True)
 	frame.to_sql(symbol, con = engine, if_exists='replace', index=True, index_label = 'id')
 
 
 def fundas_to_db(frame, symbol):
 
-	connection = engine.connect()
+	if not database_exists(engine3.url):
+		create_database(engine3.url, encoding = 'utf8')
 
-	frame.to_sql(symbol, con = engine3, if_exists = 'replace', index = True)
+	connection = engine3.connect()
+
+	frame.reset_index(inplace = True)
+	frame.to_sql(symbol, con = engine3, if_exists = 'replace', index = True, index_label = 'id')
 
 
 def prices_to_db(frame, symbol):

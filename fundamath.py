@@ -15,25 +15,25 @@ def get_funda_ratios(sym):
 
 	r_frame = pa.DataFrame(index = ind, columns = frame.columns)
 
-	r_frame.loc['current_ratio'] = frame.iloc[28] / frame.iloc[40]
+	r_frame.loc['current_ratio'] = frame.loc['Total Current Assets'] / frame.loc['Total Current Liabilities']
 
-	r_frame.loc['acid-test_ratio'] = frame.iloc[28] - frame.iloc[26] / frame.iloc[40]
+	r_frame.loc['acid-test_ratio'] = (frame.loc['Total Current Assets'] - frame.loc['Inventory']) / frame.loc['Total Current Liabilities']
 
-	r_frame.loc['cash_ratio'] = frame.iloc[23] / frame.iloc[40]
+	r_frame.loc['cash_ratio'] = frame.loc['Cash And Cash Equivalents'] / frame.loc['Total Current Liabilities']
+	
+	r_frame.loc['operating_cash_flow'] = frame.loc['Total Cash Flow From Operating Activities'] / frame.loc['Total Current Liabilities']
 
-	r_frame.loc['operating_cash_flow'] = frame.iloc[64] / frame.iloc[40]
 
+	r_frame.loc['debt_ratio'] = frame.loc['Total Liabilities'] / frame.loc['Total Assets']
 
-	r_frame.loc['debt_ratio'] = frame.iloc[46] / frame.iloc[36]
-
-	r_frame.loc['debt_to_equity'] = frame.iloc[46] / frame.iloc[55]
+	r_frame.loc['debt_to_equity'] = frame.loc['Total Liabilities'] / frame.loc['Total Stockholder Equity']
 
 	r_frame.loc['interest_coverage_ratio'] = frame.iloc[8] / frame.iloc[11]
 
 
-	#r_frame.loc['gross_profit_margin'] = frame.iloc[20] / frame.iloc[36]
+	r_frame.loc['gross_profit_margin'] = frame.loc['Gross Profit'] / frame.loc['Total Revenue']
 
-	#r_frame.loc['net_profit_margin'] = frame.iloc[] / frame.iloc[]
+	r_frame.loc['net_profit_margin'] = frame.loc['Net Income'] / frame.loc['Total Revenue']
 
 	#r_frame.loc['operating_profit_margin'] = frame.iloc[] / frame.iloc[]
 
@@ -48,5 +48,5 @@ def get_funda_ratios(sym):
 
 	print(r_frame)
 
-	#fundas_to_db(r_frame, sym)
+	fundas_to_db(r_frame, sym)
 
