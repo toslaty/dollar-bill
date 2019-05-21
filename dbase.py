@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy import VARCHAR
 from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy import inspect
 import pandas as pa
 
 
@@ -21,9 +22,12 @@ def frame_to_db(frame,symbol):
 
 	connection = engine.connect()
 
-	frame.reset_index(drop = True, inplace = True)	
-	frame.drop(frame.index[57], inplace = True)
+	frame.reset_index(drop = True, inplace = True)
+	if(len(frame.index) > 10):	
+		frame.drop(frame.index[57], inplace = True)
+
 	frame.to_sql(symbol, con = engine, if_exists='replace', index=True, index_label = 'id')
+	print(symbol+" is now in Database!")
 
 
 def fundas_to_db(frame, symbol):
@@ -35,8 +39,9 @@ def fundas_to_db(frame, symbol):
 
 	frame.reset_index(inplace = True)
 	frame.to_sql(symbol, con = engine3, if_exists = 'replace', index = True, index_label = 'id')
+	print(symbol +" ratios in db")
 
-
+#prices from knoema to DB
 def prices_to_db(frame, symbol):
 	
 	if not database_exists(engine2.url):
@@ -46,13 +51,20 @@ def prices_to_db(frame, symbol):
 
 	frame.to_sql(symbol, con = engine2, if_exists='replace', index = True, index_label = 'dt')
 
-
+#gets fundamentals from database
 def get_funda(sym):
 
+	if(sym == 'ALL'):
+		sym.lower()
+		print(type(sym))
+		
 	connection = engine.connect()
-	frame = pa.read_sql('SELECT * FROM '+str(sym), con = engine, index_col = 'index')
-
-	return frame
+	try:
+		frame = pa.read_sql('SELECT * FROM '+str(sym), con = engine, index_col = 'index')
+		return frame
+	except Exception as e:
+		print(e)	
+	
 
 def get_prices(sym,start,end):  
 	
@@ -65,5 +77,15 @@ def get_prices(sym,start,end):
 
 	return frame
 
+#get the names of all companies in the db
+def get_names():
 
+	companies = [] 
+	inspector = inspect(engine)
+	the_names = inspector.get_table_names()
+
+	for table_name in the_names:
+		companies.append(table_name)
+	return(companies)
+	print(companies)
 

@@ -8,6 +8,7 @@ import bs4 as bs
 import re
 import string
 from dbase import *
+from fundamath import *
 from knoema_req import *
 
 
@@ -20,7 +21,7 @@ def scrape_wiki_sp500():
 	symbols = []
 
 	for row in table.findAll('tr')[1:] :
-		symbol = row.findAll('td')[1].text
+		symbol = row.findAll('td')[0].text.strip("\n")
 		symbols.append(symbol)
 
 	return symbols
@@ -32,14 +33,20 @@ def get_newest():
 	for i in companies:
 		print('tryin '+i)
 		get_special(i)
+
+
+def get_ratios():
+	companies = get_names()
+	for i in companies:
 		print(i)
+		get_funda_ratios(i)
+
 
 
 def table_stuff(req):
 
 	supp = bs.BeautifulSoup(req.text, 'html5lib')
 	tables = supp.findAll('table')
-
 	outputs = []
 
 	for table in tables:
@@ -66,27 +73,28 @@ def check_chars(list):
 
 
 def data_to_frame(cols, nlist,clist):
+	
+	if(len(cols) == 4):
+		frame = pa.DataFrame(index = clist[5::5], columns = cols)
+		for x in range(4):
+			frame[cols[x]] = pa.Series(nlist[x::4], index = clist[5::5])
 
-	frame = pa.DataFrame(index = clist[5::5], columns = cols)
-
-	for x in range(4):
-		frame[cols[x]] = pa.Series(nlist[x::4], index = clist[5::5])
+	elif(len(cols) == 3):
+		frame = pa.DataFrame(index=clist[4::4], columns = cols)
+		for x in range(3):
+			frame[cols[x]] = pa.Series(nlist[x::3], index = clist[4::4])
 
 	return frame
 
 # Splits the string so we get the columns for the fundamental data
 def splitter(rev):
-
 	cols = []
 
 	if(len(rev) < 5):
 		for w in rev:
 			wort = w.split('/')
-			print(wort)
 			cols.append(wort[2])
-	else:
-		print('REWORK FOR ONLY 3 COLUMNS')		
-	print(rev)
+
 	return cols
 
 #kills comma in number cats everything to int64 and times 1000 because numbers o yahoo in thousands
@@ -106,30 +114,29 @@ def get_special(symbol):
 
 	symbol = symbol
 
-	url = 'https://finance.yahoo.com/quote/'+symbol+'/key-statistics?p='+symbol
 	url2 = 'https://finance.yahoo.com/quote/'+symbol+'/financials?p='+symbol
 	url3 = 'https://finance.yahoo.com/quote/'+symbol+'/balance-sheet?p='+symbol
 	url4 = 'https://finance.yahoo.com/quote/'+symbol+'/cash-flow?p='+symbol
 
-	x = requests.get(url)
 	y = requests.get(url2)
 	z = requests.get(url3)
 	c = requests.get(url4)
-
-	stats = table_stuff(x)
 	revenue = table_stuff(y)
 	balance = table_stuff(z)
 	cflow = table_stuff(c)
 
 	if(len(revenue) > 5):
 
-		cols = splitter(revenue[1:5]) 
+		#looks for numeric in revenue[5] becuase some entries only have three cols
+		regexp = re.compile('[0-9]+')
+		if (regexp.search(revenue[5])):
+			cols = splitter(revenue[1:4])
+		else:
+			cols = splitter(revenue[1:5])
 
 		rnumbers = check_chars(revenue)
 		bnumbers = check_chars(balance)
 		cfnumbers= check_chars(cflow)
-
-		sframe = pa.Series(stats[1::2],index = [stats[::2]])
 
 		rframe = data_to_frame(cols, rnumbers,revenue)
 		bframe = data_to_frame(cols, bnumbers, balance)
@@ -141,14 +148,18 @@ def get_special(symbol):
 		alldata.reset_index(inplace = True)
 		alldata.replace('-', 0,inplace = True)
 		real_numbers(alldata)
-		#alldata = alldata.set_index('index')
 
 		frame_to_db(alldata, symbol)
 
 	else:
 
 		print('No data available\n')
-		empty = pa.DataFrame(columns = [0,0,0])
+		#takes index from other df to create empty df and fill with 0 for later iteration
+		frame2 = get_funda('ABBV')
+
+		empty = pa.DataFrame(columns=['index', 2019, 2018, 2017,2016], index= frame2.index)
+		empty['index'] = frame2.index
+		empty = empty.fillna(0)
 		frame_to_db(empty, symbol)
 
 
@@ -163,8 +174,4 @@ def git_prices(sym, start, end):
 	df.columns = ['Close', 'High', 'Low', 'Open', 'Volume']
 
 	prices_to_db(df ,sym)
-
-
-
-	
 

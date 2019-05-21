@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import pandas as pa
 from dbase import *
 
@@ -10,8 +11,7 @@ def get_funda_ratios(sym):
 
 	ind = ['current_ratio','acid-test_ratio','cash_ratio','operating_cash_flow',
 	'debt_ratio','debt_to_equity','interest_coverage_ratio','gross_profit_margin',
-	'net_profit_margin', 'operating_profit_margin','return_on_equity','return_on_assets']
-
+	'net_profit_margin', 'return_on_equity','return_on_assets']
 
 	r_frame = pa.DataFrame(index = ind, columns = frame.columns)
 
@@ -35,17 +35,15 @@ def get_funda_ratios(sym):
 
 	r_frame.loc['net_profit_margin'] = frame.loc['Net Income'] / frame.loc['Total Revenue']
 
-	#r_frame.loc['operating_profit_margin'] = frame.iloc[] / frame.iloc[]
 
-	#r_frame.loc['return_on_equity'] = frame.iloc[] / frame.iloc[]
+	r_frame.loc['return_on_equity'] = frame.loc['Net Income'] / frame.loc['Total Stockholder Equity']
 
-	#r_frame.loc['return_on_assets'] = frame.iloc[] / frame.iloc[]
+	r_frame.loc['return_on_assets'] = frame.loc['Net Income'] / frame.loc['Total Assets']
 
 
-	#r_frame.loc[''] = frame.iloc[] / frame.iloc[]
+	#r_frame.loc[''] = frame.loc[''] / frame.loc[]
 
-	#r_frame.loc[''] = frame.iloc[]
-
+	r_frame.replace(np.inf, 0, inplace=True)
 	print(r_frame)
 
 	fundas_to_db(r_frame, sym)

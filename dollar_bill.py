@@ -6,13 +6,14 @@ from testshell import *
 from dbase import checkDB
 
 
-
 def main():
 
-	if not checkDB():
-		get_newest()
+	#if not checkDB():
+	#get_newest()
+	get_ratios()
 
-	#if not checkDate:
+	#need to write checkDate()
+	#if not checkDate():
 	#	get_all_prices()	
 
 	interpreter = Interp()
